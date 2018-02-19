@@ -33,6 +33,16 @@ namespace Xinop
             EveryThing.AddRange(Items);
         }
 
+        public void Update()
+        {
+            foreach (var thing in EveryThing)
+            {
+                if (thing.Behavior != null)
+                    thing.Behavior(thing, this);
+            }
+
+        }
+
 
         public void ExecuteCommand(Command command)
         {
@@ -142,6 +152,16 @@ namespace Xinop
             if (what == "at")
                 what = command.GetWord(1);
 
+            if (string.IsNullOrEmpty(what))
+            {
+                var place = Places.Find(p => p.Id == Hero.LocationId);
+                if (null == place)
+                    WriteLine("There is nothing to see.  You are in the void.");
+                else
+                    WriteLine(place.GetDescription(true));
+                return;
+            }
+
             bool foundThing = false;
             // find thing that we are looking at
             foreach (var item in Items.Where(i => i.Owner == Hero.HeroId || i.Owner == Hero.LocationId))
@@ -166,23 +186,16 @@ namespace Xinop
                 WriteLine($"I don't see a {what}");
 
             WriteLine();
-        }
-
-        private void UpdateCreatures()
-        {
-            foreach (var thing in EveryThing)
-                thing.Behavior(thing, this);
-        }
-
-       
-       
+        }     
+             
 
         public string GetPlaceDescription()
         {
             var place = Places.Find(p => p.Id == Hero.LocationId);
             if (null == place)
             {
-                return "You find yourself in the void, where no time and no place exist.  This is where the creator didn't not shine his light and has yet to create.";
+                Hero.State = HeroState.Dead;
+                return "You find yourself in the void, where no time and no place exist.  This is where the creator didn't shine his light and has yet to create.";
             }
             else
             {

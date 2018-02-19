@@ -32,6 +32,8 @@ namespace Xinop
                     WriteLine("I cannot understand what you want!");
                 }
 
+                world.Update();
+
                 if (world.Hero.State == HeroState.Dead)
                 {
                     WriteLine("You have died!");
