@@ -202,7 +202,7 @@ namespace Xinop
                 },
                 new DescriptionDef()
                 {
-                    State = 1, Description="a nuclear charge, humming slightly", LongDescription="a nuclear charger.  It is on.  It has a red button and a green button on it's panel.  There is a socket on it.  It is humming."
+                    State = 1, Description="a nuclear charger, humming slightly", LongDescription="a nuclear charger.  It is on.  It has a red button and a green button on it's panel.  There is a socket on it.  It is humming."
                 }
             };
             item.ExecuteCommand = (command, thing, world) =>
