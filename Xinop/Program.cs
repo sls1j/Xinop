@@ -19,21 +19,6 @@ namespace Xinop
                 string description = world.GetPlaceDescription();
                 WriteLine(description);
 
-                Write("> ");
-                string line = ReadLine();
-                Command command;
-                if (Command.TryParse(line, out command))
-                {
-                    world.ExecuteCommand(command);
-                }
-                else
-                {
-                    WriteLine();
-                    WriteLine("I cannot understand what you want!");
-                }
-
-                world.Update();
-
                 if (world.Hero.State == HeroState.Dead)
                 {
                     WriteLine("You have died!");
@@ -46,6 +31,21 @@ namespace Xinop
                 }
 
                 WriteLine();
+
+                Write("> ");
+                string line = ReadLine().ToLower();
+                Command command;
+                if (Command.TryParse(line, out command))
+                {
+                    world.ExecuteCommand(command);
+                }
+                else
+                {
+                    WriteLine();
+                    WriteLine("I cannot understand what you want!");
+                }
+
+                world.Update();               
             }
 
             WriteLine("Press Key to end");

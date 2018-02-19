@@ -9,8 +9,8 @@ namespace Xinop
 {
     public partial class World
     {
-        public Hero Hero;       
-        
+        public Hero Hero;
+
         public List<Place> Places;
         public List<Creature> Creatures;
         public List<Item> Items;
@@ -54,7 +54,7 @@ namespace Xinop
             if (place.ExecuteCommand != null && place.ExecuteCommand(command, place, this))
                 return;
 
-            foreach( var creature in Creatures.Where( c => c.PlaceId == Hero.LocationId ))
+            foreach (var creature in Creatures.Where(c => c.PlaceId == Hero.LocationId))
             {
                 if (creature.ExecuteCommand != null && creature.ExecuteCommand(command, creature, this))
                     return;
@@ -67,9 +67,13 @@ namespace Xinop
             }
 
             Hero.ExecuteCommand(command, this);
-            
-        }          
-             
+
+        }
+
+        public static string SplitCamelCase(string input)
+        {
+            return System.Text.RegularExpressions.Regex.Replace(input, "([A-Z])", " $1", System.Text.RegularExpressions.RegexOptions.Compiled).Trim();
+        }
 
         public string GetPlaceDescription()
         {
@@ -94,6 +98,8 @@ namespace Xinop
                 }
                 scene.AppendLine();
 
+                scene.AppendLine($"You feel {SplitCamelCase(Hero.State.ToString()).ToLower()} ");
+
 
                 // get avaiable directions
                 scene.Append("You can go ");
@@ -107,5 +113,5 @@ namespace Xinop
     }
 
 
-    
+
 }

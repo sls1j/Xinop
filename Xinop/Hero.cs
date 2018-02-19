@@ -12,10 +12,11 @@ namespace Xinop
         public HeroState State;
         public List<DescriptionDef> DescriptionDefs;
         public string LocationId;
-        public string LastLocationId;
+        public string LastLocationId;        
 
         public Hero()
         {
+            HeroId = "**hero**";
             Name = "George";
             State = 0;
             DescriptionDefs = new List<DescriptionDef>();
@@ -75,19 +76,24 @@ namespace Xinop
             Write("You have ");
             var inventory = world.EveryThing.Where(t => t.LocationId == HeroId).ToArray();
 
-            for (int i = 0; i < inventory.Length; i++)
+            if (inventory.Length == 0)
+                WriteLine("You have nothing.");
+            else
             {
-                var item = inventory[i];
-                if (i == 0 && inventory.Length == 1)
-                    WriteLine(item.Name + ".");
-                else if (i == 0)
-                    Write(item.Name);
-                else if (i == inventory.Length - 1 && inventory.Length == 2)
-                    WriteLine($" and {item.Name}.");
-                else if (i == inventory.Length - 1)
-                    WriteLine($", and {item.Name}.");
-                else
-                    Write($", {item.Name}");
+                for (int i = 0; i < inventory.Length; i++)
+                {
+                    var item = inventory[i];
+                    if (i == 0 && inventory.Length == 1)
+                        WriteLine($"a {item.Name} .");
+                    else if (i == 0)
+                        Write(item.Name);
+                    else if (i == inventory.Length - 1 && inventory.Length == 2)
+                        WriteLine($" and a {item.Name}.");
+                    else if (i == inventory.Length - 1)
+                        WriteLine($", and a {item.Name}.");
+                    else
+                        Write($", a {item.Name}");
+                }
             }
         }
 

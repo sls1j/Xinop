@@ -12,6 +12,7 @@ namespace Xinop
 
         public string Id;
         public int State;
+        public int ExtraState;
         public string Name;
         public List<DescriptionDef> Descriptions;
         public ExecuteCommand ExecuteCommand;
@@ -57,7 +58,12 @@ namespace Xinop
             State = 0;
             _properties = new Dictionary<string, object>();
             Descriptions = new List<DescriptionDef>();
-        }        
+        }
+
+        public override string ToString()
+        {
+            return $"{this.GetType().Name} {this.Name}";
+        }
     }
 
     public delegate bool ExecuteCommand(Command command, Thing thing, World world);

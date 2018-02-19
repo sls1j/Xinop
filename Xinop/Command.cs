@@ -6,24 +6,28 @@ namespace Xinop
 {
     public class Command
     {
-        private string[] words;
+        private string[] _workTokens;
         public Command(string Verb, string[] Words)
         {
             verb = Verb;
-            words = Words;
+            _workTokens = Words;
+            this.Words = string.Join(" ", Words);
         }
 
         public string verb { get; private set; }
         public string GetWord(int index)
         {
-            if (index < 0 || index >= words.Length)
+            if (index < 0 || index >= _workTokens.Length)
                 return string.Empty;
 
-            return words[index];
+            return _workTokens[index];
         }
+
+        public string Words { get; private set; }
 
         public static bool TryParse(string line, out Command command)
         {
+            line = line.ToLower();
             try
             {
                 string[] allwords = line.Split(' ');

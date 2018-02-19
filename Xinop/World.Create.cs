@@ -78,6 +78,13 @@ namespace Xinop
             place.AddDescription(0, "This hole opens up, and isn't so dark, or so small.  It looks as if it was dug by machine.");
             place.AddDirection(Dir.Up, "up a stairway there is a little light.", "cross-roads");
             this.Places.Add(place);
+
+            place = new Place();
+            place.Id = "forest_1";
+            place.Name = "Forest";
+            place.AddDescription(0, "You are in a forest with tall pine trees all around.");
+            place.AddDirection(Dir.North, "north on a small trail that leads out of the forest", "cross-roads");
+            this.Places.Add(place);
         }
 
         private void CreateItems()
@@ -210,10 +217,165 @@ namespace Xinop
 
             item.Owner = "small_black_hole"; // put the nuclear charger in the ground
             this.Items.Add(item);
+
+            item = new Item();
+            item.Id = "book_of_mormon";
+            item.Name = "book";
+            item.IsPortable = true;
+            item.AddDescription(0, "A tattered book", "The title is hard to read but you make out Book of Mormon on the cover");
+            item.ExecuteCommand = (command, thing, world) =>
+            {
+                if ((command.verb == "get" || command.verb == "take") && command.GetWord(0) == "book")
+                {
+                    WriteLine("You feel a strange expectancy as you pick up this book.  As if you are destined to read it.");
+                }
+                else if (command.verb == "read" && command.GetWord(0) == "book")
+                {
+                    if (world.Hero.HeroId == thing.LocationId)
+                    {
+                        WriteLine("The book reads,\"if ye will enter in by the way, and receive the Holy Ghost, it will show unto you all things what ye should do.\"  You feel enlightened and strengthened");
+                        world.Hero.State = HeroState.ExtraStrong;
+                    }
+                    else
+                        WriteLine("You must have the book to read it.");
+
+                    return true;
+                }                
+
+                return false;
+            };
+            item.Owner = "forest_1";
+            this.Items.Add(item);
+
+            item = new Item();
+            item.Id = "cooking_meritbadge";
+            item.Name = "cooking merit badge";
+            item.AddDescription(0, "This is a cooking merit badge earned by some serious cooking.");
+            this.Items.Add(item);
         }
 
         private void CreateCreatures()
         {
+            Creature c = new Creature();
+            c.Id = "monster";
+            c.Name = "monster";
+            c.State = 0;
+            c.AddDescription(0, "a monster with large and pointy teeth, big muscles, and a foul smell.  It looks angry.");
+            c.AddDescription(1, "a monster that looks hungry and shows signs of wanting to eat you.  It has big muscles and pointy teeth.  It is looking at you.");
+            c.AddDescription(2, "a monster that is biting and chewing on your arm.");
+            c.AddDescription(3, "a monster that is no longer hungry as it uses your finger bone to pick its teeth.");
+            c.AddDescription(4, "a dead monster, with a bashed in head.");
+            c.AddDescription(5, "a beautiful princess.");
+            c.Behavior = (thing, world) =>
+            {
+                // we are in the same room as the monster
+                if (world.Hero.LocationId == thing.LocationId)
+                {
+                    switch (thing.State)
+                    {
+                        case 0: thing.State = 1; thing.ExtraState = 0; break;
+                        case 1 when thing.ExtraState >= 2: thing.State = 2; Hero.InjuredForMoves = 20; Hero.State = HeroState.Injured; break;
+                        case 1: thing.ExtraState++; break;
+                        case 2: thing.State = 3; Hero.State = HeroState.Dead; break;
+                        case 4: break;
+                        case 5: break;
+                    }
+                } 
+                else // not with the monster
+                {
+                    if ( thing.State != 4 )
+                        thing.State = 0;
+                }
+            };
+
+            c.ExecuteCommand = (command, thing, world) =>
+            {
+                switch (command.verb)
+                {
+                    case "kiss" when command.Words == thing.Name:
+                        if (thing.State != 5)
+                        {
+                            WriteLine("The monster turns into a beautiful princess. She smiles at you invitingly.");
+                            thing.Name = "princess";
+                            thing.State = 5;
+                        }
+                        else
+                        {
+                            WriteLine("The princess is really a terrible monster.  As you move in close to kiss her she transforms into a monster with pointy teeth.");
+                            thing.Name = "monster";
+                            thing.State = 1;
+                            thing.ExtraState = 3;
+                        }
+                        return true;
+                    case "punch" when command.Words == thing.Name:
+                    case "hit" when command.Words == thing.Name:
+                    case "kick" when command.Words == thing.Name:
+                        if (thing.State == 4)
+                            WriteLine($"You {command.verb} a dead monster. It is good practice, but otherwise ineffective");
+                        else if (world.Hero.State == HeroState.ExtraStrong)
+                        {
+                            WriteLine($"You {command.verb} the monster in the face.  He yelps.  You can tell it's pondering whether to attack you or not.");
+                            c.State = 0;
+                        }
+                        else
+                        {
+                            WriteLine("The monster is not pleased.  He bares his teeth in a large menacing manner.");
+                            c.State = 1;
+                            c.ExtraState = 1;
+                        }
+                        return true;
+                    case "kick":
+                    case "punch":
+                    case "hit":
+                    case "kiss":
+                        WriteLine($"You want to {command.verb} what?  I don't think so.");
+                        return true;
+                    case "throw" when command.Words == $"flashlight at {thing.Name}":
+                        {
+                            var flashlight = world.Items.Find(i => i.Name == "flashlight");
+                            if (flashlight.Owner == world.Hero.HeroId)
+                            {
+
+                                if (thing.State == 4)
+                                    WriteLine("Your flashlight hits the dead beast and does nothing.");
+                                else
+                                {
+                                    if (flashlight.State == 1)
+                                    {
+                                        if (world.Hero.State == HeroState.ExtraStrong)
+                                        {
+                                            WriteLine("You throw your flashlight with exceeding strength.  It enters the nose of the monster while blazing with the light of one thousand suns.  The brain of the monster is cooked via the light.  You have earned the Cooking Merit Badge and killed the monster.");
+                                            thing.State = 4;
+                                            var meritBadge = world.Items.Find(i => i.Name == "cooking merit badge");
+                                            meritBadge.Owner = world.Hero.HeroId;
+                                        }
+                                        else
+                                        {
+                                            WriteLine("Your flashlight dazzals the monster briefly. It then eats the flashlight.");
+                                            flashlight.Owner = thing.Id;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        WriteLine("You miss the monster.  It doesn't seem to notice your attack. You lost your flashlight");
+                                        flashlight.Owner = world.Hero.LocationId;
+                                    }
+                                }
+                                return true;
+                            }
+                            else
+                            {
+                                WriteLine("You must have the flashlight to throw it.");
+                            }
+                            return true;
+                        }
+                }
+                return false;
+            };
+
+
+            c.PlaceId = "north_road";
+            this.Creatures.Add(c);
 
         }
 
