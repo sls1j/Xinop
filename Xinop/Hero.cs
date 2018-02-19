@@ -11,7 +11,7 @@ namespace Xinop
         public string Name;
         public HeroState State;
         public List<DescriptionDef> DescriptionDefs;
-        public string LocationId;
+        public string Location;
         public string LastLocationId;        
 
         public Hero()
@@ -20,7 +20,7 @@ namespace Xinop
             Name = "George";
             State = 0;
             DescriptionDefs = new List<DescriptionDef>();
-            LocationId = "Start";
+            Location = "Start";
         }
 
         public string HeroId { get; internal set; }
@@ -102,7 +102,7 @@ namespace Xinop
             bool foundThing = false;
             string what = command.GetWord(0);
             // find item and pick them up
-            var items = world.Items.FindAll(i => i.Name == what && i.LocationId == LocationId);
+            var items = world.Items.FindAll(i => i.Name == what && i.LocationId == Location);
             foreach (var item in items)
             {
                 if (item.IsPortable)
@@ -112,7 +112,7 @@ namespace Xinop
                 foundThing = true;
             }
 
-            var creatures = world.Creatures.FindAll(c => c.Name == what && c.LocationId == LocationId);
+            var creatures = world.Creatures.FindAll(c => c.Name == what && c.LocationId == Location);
             foreach (var creature in creatures)
             {
                 foundThing = true;
@@ -128,12 +128,12 @@ namespace Xinop
             string direction = command.GetWord(0);
             // check if a creature is preventing your from going
 
-            var place = world.Places.Find(p => p.Id == LocationId);
+            var place = world.Places.Find(p => p.Name == Location);
             foreach (var placeDirection in place.Directions)
             {
                 if (placeDirection.Name == direction || placeDirection.ShortName == direction)
                 {
-                    LocationId = placeDirection.DestinationId;
+                    Location = placeDirection.DestinationId;
                     return;
                 }
             }
@@ -147,7 +147,7 @@ namespace Xinop
 
             if (string.IsNullOrEmpty(what))
             {
-                var place = world.Places.Find(p => p.Id == LocationId);
+                var place = world.Places.Find(p => p.Name == Location);
                 if (null == place)
                     WriteLine("There is nothing to see.  You are in the void.");
                 else
@@ -157,7 +157,7 @@ namespace Xinop
 
             bool foundThing = false;
             // find thing that we are looking at
-            foreach (var item in world.Items.Where(i => i.Owner == HeroId || i.Owner == LocationId))
+            foreach (var item in world.Items.Where(i => i.Owner == HeroId || i.Owner == Location))
             {
                 if (item.Name == what)
                 {
@@ -166,7 +166,7 @@ namespace Xinop
                 }
             }
 
-            foreach (var creature in world.Creatures.Where(c => c.PlaceId == LocationId))
+            foreach (var creature in world.Creatures.Where(c => c.PlaceId == Location))
             {
                 if (creature.Name == what)
                 {

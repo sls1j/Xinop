@@ -33,7 +33,7 @@ namespace Xinop
                 WriteLine();
 
                 Write("> ");
-                string line = ReadLine().ToLower();
+                string line = ReadLine();
                 Command command;
                 if (Command.TryParse(line, out command))
                 {

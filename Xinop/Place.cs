@@ -9,7 +9,7 @@ namespace Xinop
     public class Place : Thing
     {
         public List<Direction> Directions;
-        public override string LocationId => Id;
+        public override string LocationId => Name;
 
         public void AddDirection(string name, string shortName, string description, string destinationId )
         {

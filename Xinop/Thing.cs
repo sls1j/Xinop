@@ -10,10 +10,9 @@ namespace Xinop
     {
         private Dictionary<string, object> _properties;
 
-        public string Id;
+        public string Name;
         public int State;
         public int ExtraState;
-        public string Name;
         public List<DescriptionDef> Descriptions;
         public ExecuteCommand ExecuteCommand;
         public BehaviorMethod Behavior;

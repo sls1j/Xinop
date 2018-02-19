@@ -20,13 +20,12 @@ namespace Xinop
         {
             var place = new Place();
             place.Name = "cross roads";
-            place.Id = "cross-roads";
             place.AddDescription(state: 0, description: "You are at a cross roads. The sky is blue.");
             place.AddDescription(state: 1, description: "You are at a cross roads. The sky is dark and overcast.");
-            place.AddDirection(Dir.North, "north on a narrow dirt track that doesn't look well used.", "north_road");
-            place.AddDirection(Dir.East, "east on a broad paved road.", "broad_road");
-            place.AddDirection(Dir.South, "south a simple road that leads toward a vast forest.", "forest_1");
-            place.AddDirection(Dir.Down, "down small black hole in the ground.", "small_black_hole");
+            place.AddDirection(Dir.North, "north on a narrow dirt track that doesn't look well used.", "north road");
+            place.AddDirection(Dir.East, "east on a broad paved road.", "broad road");
+            place.AddDirection(Dir.South, "south a simple road that leads toward a vast forest.", "forest");
+            place.AddDirection(Dir.Down, "down small black hole in the ground.", "small black hole");
             place.ExecuteCommand = (command, thing, world) =>
                 {
                     switch (command.verb)
@@ -63,27 +62,24 @@ namespace Xinop
             this.Places.Add(place);
 
             // set the default location
-            this.Hero.LocationId = place.Id;
+            this.Hero.Location = place.Name;
 
             place = new Place();
-            place.Id = "north_road";
-            place.Name = "North Road";
+            place.Name = "north road";
             place.AddDescription(0, "The road is well traveled.  It is wide with neat gutters along the side.  However, it is rather lonely.");
-            place.AddDirection(Dir.South, "south there seems to be some sort of a junction.", "cross-roads");
+            place.AddDirection(Dir.South, "south there seems to be some sort of a junction.", "cross roads");
             this.Places.Add(place);
 
             place = new Place();
-            place.Id = "small_black_hole";
-            place.Name = "Small Black Hole";
+            place.Name = "small black hole";
             place.AddDescription(0, "This hole opens up, and isn't so dark, or so small.  It looks as if it was dug by machine.");
-            place.AddDirection(Dir.Up, "up a stairway there is a little light.", "cross-roads");
+            place.AddDirection(Dir.Up, "up a stairway there is a little light.", "cross roads");
             this.Places.Add(place);
 
             place = new Place();
-            place.Id = "forest_1";
-            place.Name = "Forest";
+            place.Name = "forest";
             place.AddDescription(0, "You are in a forest with tall pine trees all around.");
-            place.AddDirection(Dir.North, "north on a small trail that leads out of the forest", "cross-roads");
+            place.AddDirection(Dir.North, "north on a small trail that leads out of the forest", "cross roads");
             this.Places.Add(place);
         }
 
@@ -91,7 +87,6 @@ namespace Xinop
         {
             // make flashlight
             var item = new Item();
-            item.Id = "flashlight";
             item.Name = "flashlight";
             item.IsPortable = true;
             item.AddDescription(0, "a flashlight turned off.", "a flashlight with the words Acme on the switch, it has a good weight to it. It is off");
@@ -154,13 +149,12 @@ namespace Xinop
                     }
                 }
             };
-            item.Owner = "cross-roads"; // put the flashlight in the starting place
+            item.Owner = "cross roads"; // put the flashlight in the starting place
 
             Items.Add(item);
 
             item = new Item();
             item.Name = "charger";
-            item.Id = "charger";
             item.IsPortable = false;
             item.AddDescription(0, "a nuclear charger.", "a nuclear charger. It has a red button and a green button on it's panel.  There is a socket on it.");
             item.AddDescription(1, "a nuclear charger, humming slightly", "a nuclear charger.  It is on.  It has a red button and a green button on it's panel.  There is a socket on it.  It is humming.");
@@ -194,7 +188,7 @@ namespace Xinop
                 }
                 else if (command.verb == "plug" && command.GetWord(0) == "in" && command.GetWord(1) == "flashlight")
                 {
-                    var flashlight = world.Items.Find(i => i.Id == "flashlight");
+                    var flashlight = world.Items.Find(i => i.Name == "flashlight");
                     if (flashlight.Owner == world.Hero.HeroId)
                     {
                         if (thing.State == 0)
@@ -215,17 +209,16 @@ namespace Xinop
                 return false;
             };
 
-            item.Owner = "small_black_hole"; // put the nuclear charger in the ground
+            item.Owner = "small black hole"; // put the nuclear charger in the ground
             this.Items.Add(item);
 
             item = new Item();
-            item.Id = "book_of_mormon";
             item.Name = "book";
             item.IsPortable = true;
             item.AddDescription(0, "A tattered book", "The title is hard to read but you make out Book of Mormon on the cover");
             item.ExecuteCommand = (command, thing, world) =>
             {
-                if ((command.verb == "get" || command.verb == "take") && command.GetWord(0) == "book")
+                if ((command.verb == "get" || command.verb == "take") && command.Words == "book")
                 {
                     WriteLine("You feel a strange expectancy as you pick up this book.  As if you are destined to read it.");
                 }
@@ -244,11 +237,10 @@ namespace Xinop
 
                 return false;
             };
-            item.Owner = "forest_1";
+            item.Owner = "forest";
             this.Items.Add(item);
 
             item = new Item();
-            item.Id = "cooking_meritbadge";
             item.Name = "cooking merit badge";
             item.AddDescription(0, "This is a cooking merit badge earned by some serious cooking.");
             this.Items.Add(item);
@@ -257,7 +249,6 @@ namespace Xinop
         private void CreateCreatures()
         {
             Creature c = new Creature();
-            c.Id = "monster";
             c.Name = "monster";
             c.State = 0;
             c.AddDescription(0, "a monster with large and pointy teeth, big muscles, and a foul smell.  It looks angry.");
@@ -269,7 +260,7 @@ namespace Xinop
             c.Behavior = (thing, world) =>
             {
                 // we are in the same room as the monster
-                if (world.Hero.LocationId == thing.LocationId)
+                if (world.Hero.Location == thing.LocationId)
                 {
                     switch (thing.State)
                     {
@@ -352,13 +343,12 @@ namespace Xinop
                                         else
                                         {
                                             WriteLine("Your flashlight dazzals the monster briefly. It then eats the flashlight.");
-                                            flashlight.Owner = thing.Id;
                                         }
                                     }
                                     else
                                     {
                                         WriteLine("You miss the monster.  It doesn't seem to notice your attack. You lost your flashlight");
-                                        flashlight.Owner = world.Hero.LocationId;
+                                        flashlight.Owner = world.Hero.Location;
                                     }
                                 }
                                 return true;
@@ -374,7 +364,7 @@ namespace Xinop
             };
 
 
-            c.PlaceId = "north_road";
+            c.PlaceId = "north road";
             this.Creatures.Add(c);
 
         }

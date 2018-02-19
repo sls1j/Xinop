@@ -46,7 +46,7 @@ namespace Xinop
 
         public void ExecuteCommand(Command command)
         {
-            var place = Places.Find(p => p.Id == Hero.LocationId);
+            var place = Places.Find(p => p.Name == Hero.Location);
 
             if (null == place)
                 return;
@@ -54,13 +54,13 @@ namespace Xinop
             if (place.ExecuteCommand != null && place.ExecuteCommand(command, place, this))
                 return;
 
-            foreach (var creature in Creatures.Where(c => c.PlaceId == Hero.LocationId))
+            foreach (var creature in Creatures.Where(c => c.PlaceId == Hero.Location))
             {
                 if (creature.ExecuteCommand != null && creature.ExecuteCommand(command, creature, this))
                     return;
             }
 
-            foreach (var item in Items.Where(i => i.Owner == Hero.HeroId || i.Owner == Hero.LocationId))
+            foreach (var item in Items.Where(i => i.Owner == Hero.HeroId || i.Owner == Hero.Location))
             {
                 if (item.ExecuteCommand != null && item.ExecuteCommand(command, item, this))
                     return;
@@ -77,7 +77,7 @@ namespace Xinop
 
         public string GetPlaceDescription()
         {
-            var place = Places.Find(p => p.Id == Hero.LocationId);
+            var place = Places.Find(p => p.Name == Hero.Location);
             if (null == place)
             {
                 Hero.State = HeroState.Dead;
@@ -89,7 +89,7 @@ namespace Xinop
                 scene.AppendLine(place.GetDescription(false));
 
                 // get current place description
-                var otherThings = EveryThing.Where(t => !(t is Place) && t.LocationId == Hero.LocationId);
+                var otherThings = EveryThing.Where(t => !(t is Place) && t.LocationId == Hero.Location);
                 if (otherThings.Count() > 0)
                 {
                     scene.Append("You see ");
