@@ -76,7 +76,9 @@ namespace Xinop
             this.Places.Add(place);
 
             // set the default location
-            this.Hero.PlaceId = place.Id;
+            this.Hero.LocationId = place.Id;
+
+
         }
 
         private void CreateItems()
@@ -85,15 +87,16 @@ namespace Xinop
             var item = new Item();
             item.Id = "flashlight_id";
             item.Name = "flashlight";
+            item.IsPortable = true;
             item.Descriptions = new DescriptionDef[]{
                     new DescriptionDef(){
                         State = 0, Description = "a flashlight turned off.", LongDescription = "a flashlight with the words Acme on the switch, it has a good weight to it. It is off"
                     },
                     new DescriptionDef(){
-                        State = 1, Description = "a flashlight turn on.", LongDescription = "a flashlight with words Acme on the switch.  It shines with a light of a thousands sun."
+                        State = 1, Description = "a flashlight turned on.", LongDescription = "a flashlight with words Acme on the switch.  It shines with a light of a thousands sun."
                     },
                     new DescriptionDef(){
-                        State = 2, Description = "a flashlight turn on, but dark", LongDescription = "a flashlight with words Acme on the switch. If it had batteries perhaps it would shine with the light of a thousand suns."
+                        State = 2, Description = "a flashlight turned on, but not shining", LongDescription = "a flashlight with words Acme on the switch. If it had batteries perhaps it would shine with the light of a thousand suns."
                     }
                 };
             item.ExecuteCommand = (command, thing, world) =>
@@ -106,6 +109,11 @@ namespace Xinop
                             else
                                 thing.State = 2;
                             
+                            return true;
+                        }
+                        else if (command.verb == "turn" && command.GetWord(0) == "off" && command.GetWord(1) == thing.Name)
+                        {
+                            thing.State = 0;
                             return true;
                         }
 

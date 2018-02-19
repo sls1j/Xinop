@@ -42,6 +42,8 @@ namespace Xinop
                     WriteLine("You have quit.");
                     break;
                 }
+
+                WriteLine();
             }
 
             WriteLine("Press Key to end");
