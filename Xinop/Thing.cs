@@ -13,7 +13,7 @@ namespace Xinop
         public string Id;
         public int State;
         public string Name;
-        public DescriptionDef[] Descriptions;
+        public List<DescriptionDef> Descriptions;
         public ExecuteCommand ExecuteCommand;
         public BehaviorMethod Behavior;
 
@@ -42,11 +42,22 @@ namespace Xinop
             _properties[name] = value;
         }
 
+        public void AddDescription(int state, string description, string longDescription = null)
+        {
+            var desc = new DescriptionDef()
+            {
+                State = state, Description = description, LongDescription = longDescription
+            };
+
+            this.Descriptions.Add(desc);
+        }
+
         public Thing()
         {
             State = 0;
             _properties = new Dictionary<string, object>();
-        }
+            Descriptions = new List<DescriptionDef>();
+        }        
     }
 
     public delegate bool ExecuteCommand(Command command, Thing thing, World world);
